@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>প্রশ্নপত্র নির্মাতা ও প্রশ্নব্যাংক</title>
+<style>
+:root{font-family:system-ui,"Noto Sans Bengali",Arial,sans-serif;color:#172033;background:#f4f6fb}*{box-sizing:border-box}body{margin:0}header{background:#fff;border-bottom:1px solid #e5e9f2;padding:18px max(18px,calc((100% - 1200px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}h1{font-size:21px;margin:0}header p{margin:4px 0 0;color:#64748b;font-size:13px}.status{font-size:12px;color:#0f766e;background:#ccfbf1;padding:6px 10px;border-radius:20px}main{max-width:1200px;margin:22px auto;padding:0 16px}.tabs{display:flex;gap:8px;margin-bottom:16px}.tab,button{border:0;border-radius:9px;padding:10px 14px;background:#e2e8f0;color:#1e293b;font-weight:650;cursor:pointer}.tab.active,button.primary{background:#4f46e5;color:white}button.danger{background:#fee2e2;color:#b91c1c}button.small{padding:6px 9px;font-size:12px}.panel{display:none;background:white;border:1px solid #e5e9f2;border-radius:14px;padding:18px;box-shadow:0 4px 18px #0f172a08}.panel.active{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}select[multiple]{min-height:112px;padding:7px} .hint{font-size:11px;color:#64748b;font-weight:400}label{font-size:13px;font-weight:650;color:#475569}input,select,textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;background:white}textarea{min-height:80px;resize:vertical}.section-title{margin:0 0 14px;font-size:18px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.muted{color:#64748b;font-size:13px}.list{display:grid;gap:10px;margin-top:14px}.qcard{border:1px solid #e2e8f0;border-radius:10px;padding:12px}.qtop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.tag{font-size:11px;padding:3px 7px;background:#eef2ff;color:#4338ca;border-radius:20px;margin-right:4px}.qtext{white-space:pre-wrap;line-height:1.6;margin:8px 0}.hidden{display:none!important}.paper{max-width:850px;margin:18px auto;padding:32px;background:white;border:1px solid #e2e8f0;min-height:300px;color:#111}.paperhead{text-align:center;border-bottom:1px solid #777;padding-bottom:12px;margin-bottom:14px}.paperhead h2{margin:0 0 5px}.paper-meta{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;margin:12px 0;text-align:center}.paper-q{margin:12px 0;line-height:1.65;break-inside:avoid}.paper-q .parts{padding-left:22px}.rtl{direction:rtl;text-align:right}.toast{position:fixed;right:18px;bottom:18px;background:#0f172a;color:white;padding:11px 16px;border-radius:9px;display:none;z-index:9}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.count{font-size:12px;color:#64748b}@media print{body{background:white}header,main>.tabs,#generator,#bank,.no-print,.toast{display:none!important}main{margin:0;padding:0}.panel#paper{display:block!important;border:0;padding:0}.paper{border:0;margin:0;padding:12mm;max-width:none;min-height:0}.paper-q{break-inside:avoid}}
+</style><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head><body>
+<header><div><h1>প্রশ্নপত্র নির্মাতা ও প্রশ্নব্যাংক</h1><p>CQ, SQ • বাংলা / English / العربية • একাধিক বিভাগ • PDF ও Word</p></div><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><a href="MCQ-Generator-CQ-linked-final.html" style="background:#4f46e5;color:white;padding:9px 13px;border-radius:9px;text-decoration:none;font-size:13px;font-weight:700">MCQ Generator ↗</a><span class="status" id="saveStatus">Local storage ready</span></div></header>
+<main><nav class="tabs no-print"><button class="tab active" data-tab="generator">প্রশ্নপত্র তৈরি</button><button class="tab" data-tab="bank">প্রশ্নব্যাংক <span id="bankCount"></span></button><button class="tab" data-tab="paper">প্রিভিউ / Export</button></nav>
+<section id="generator" class="panel active">
+<h2 class="section-title">প্রশ্নপত্রের তথ্য</h2><div class="grid">
+<div class="field"><label>প্রতিষ্ঠানের নাম</label><input id="school" value="ঘাগটিয়া চালা উচ্চ বিদ্যালয়"></div><div class="field"><label>পরীক্ষার নাম</label><input id="exam" value="অর্ধ-বার্ষিক পরীক্ষা - ২০২৬"></div><div class="field"><label>শ্রেণি</label><input id="className" value="নবম-দশম"></div><div class="field"><label>বিষয়</label><input id="subjectName" value="গণিত"></div><div class="field"><label>সময়</label><input id="examTime" value="২ ঘণ্টা ৩০ মিনিট"></div><div class="field"><label>পূর্ণমান</label><input id="fullMarks" value="৫০"></div></div>
+<div class="field"><label>নির্দেশনা</label><input id="instruction" value="[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। সকল প্রশ্নের উত্তর দিতে হবে।]"></div>
+<h2 class="section-title">প্রশ্ন নির্বাচন</h2><div class="grid">
+<div class="field"><label>শ্রেণি</label><select id="fClass"></select></div><div class="field"><label>বিষয়</label><select id="fSubject"></select></div><div class="field"><label>অধ্যায় (একাধিক নির্বাচন)</label><select id="fChapter" multiple aria-label="একাধিক অধ্যায় নির্বাচন"></select><span class="hint">“সব অধ্যায়” নির্বাচন করলে সব অধ্যায় থেকে প্রশ্ন আসবে। একাধিক বাছতে Ctrl / Command ব্যবহার করুন।</span></div><div class="field"><label>টপিক (একাধিক নির্বাচন)</label><select id="fTopic" multiple aria-label="একাধিক টপিক নির্বাচন"></select><span class="hint">“সব টপিক” নির্বাচন করলে সব টপিক থেকে প্রশ্ন আসবে। একাধিক বাছতে Ctrl / Command ব্যবহার করুন।</span></div><div class="field"><label>প্রশ্নের ধরন</label><select id="fType"><option value="ALL">CQ + SQ</option><option>CQ</option><option>SQ</option></select></div><div class="field"><label>কঠিনতার স্তর</label><select id="fCategory"><option value="ALL">সব</option><option>Easy</option><option>Medium Hard</option><option>Hard</option></select></div><div class="field"><label>CQ সংখ্যা</label><input id="cqCount" type="number" min="0" value="2"></div><div class="field"><label>SQ সংখ্যা</label><input id="sqCount" type="number" min="0" value="3"></div><div class="field"><label>SQ প্রতি প্রশ্নের নম্বর</label><input id="sqPaperMarks" type="number" min="1" value="2"></div><div class="field"><label>CQ ক নম্বর</label><input id="cqKaMarks" type="number" min="0" value="1"></div><div class="field"><label>CQ খ নম্বর</label><input id="cqKhaMarks" type="number" min="0" value="2"></div><div class="field"><label>CQ গ নম্বর</label><input id="cqGaMarks" type="number" min="0" value="3"></div><div class="field"><label>CQ ঘ নম্বর</label><input id="cqGhaMarks" type="number" min="0" value="4"></div></div>
+<div class="actions"><button class="primary" id="generate">প্রশ্নপত্র তৈরি করুন</button><button id="clearPaper">প্রশ্নপত্র খালি করুন</button><span class="muted" id="poolInfo"></span></div><div id="selectedList" class="list"></div></section>
+<section id="bank" class="panel"><div class="toolbar"><h2 class="section-title">প্রশ্নব্যাংক</h2><div class="actions"><button id="firebaseConnectBtn">Firebase সংযোগ</button><button class="primary" id="addQuestion">+ নতুন প্রশ্ন যোগ করুন</button></div></div>
+<div class="grid"><div class="field"><label>খুঁজুন</label><input id="search" placeholder="প্রশ্ন, বিষয়, অধ্যায়..."></div><div class="field"><label>ধরন</label><select id="bankType"><option value="ALL">সব</option><option>CQ</option><option>SQ</option></select></div><div class="field"><label>বিষয়</label><select id="bankSubject"><option value="ALL">সব বিষয়</option></select></div></div><div class="toolbar"><span class="count" id="filteredCount"></span><div class="actions"><button id="exportJson">JSON Backup</button><label class="tab" for="importJson">JSON Import</label><input class="hidden" id="importJson" type="file" accept="application/json"></div></div><div id="bankList" class="list"></div></section>
+<section id="paper" class="panel"><div class="toolbar no-print"><h2 class="section-title">প্রশ্নপত্র প্রিভিউ</h2><div class="actions"><select id="language" aria-label="Language"><option value="bn">বাংলা</option><option value="en">English</option><option value="ar">العربية</option></select><button class="primary" id="print">Print / PDF</button><button id="word">Word Export</button></div></div><div class="paper" id="paperView"></div></section>
+</main><div class="toast" id="toast"></div>
+<dialog id="editor"><form method="dialog" id="questionForm"><div class="toolbar"><h2 id="editorTitle">নতুন প্রশ্ন যোগ করুন</h2><button value="cancel" class="small">✕</button></div><input type="hidden" id="editId"><div class="grid"><div class="field"><label>শ্রেণি</label><input id="qClass" required value="নবম-দশম"></div><div class="field"><label>বিষয়</label><input id="qSubject" required></div><div class="field"><label>অধ্যায়</label><input id="qChapter"></div><div class="field"><label>টপিক</label><input id="qTopic"></div><div class="field"><label>বিভাগ / Section</label><input id="qSection"></div><div class="field"><label>ধরন</label><select id="qType"><option>CQ</option><option>SQ</option></select></div><div class="field"><label>কঠিনতা</label><select id="qCategory"><option>Easy</option><option>Medium Hard</option><option>Hard</option></select></div></div><div id="sqFields"><div class="field"><label>সংক্ষিপ্ত প্রশ্ন</label><textarea id="qQuestion"></textarea></div><div class="field"><label>নম্বর</label><input id="qMarks" type="number" min="1" value="2"></div></div><div id="cqFields"><div class="field"><label>উদ্দীপক / Stem</label><textarea id="qStem"></textarea></div><div class="grid"><div class="field"><label>ক</label><textarea id="qKa"></textarea></div><div class="field"><label>খ</label><textarea id="qKha"></textarea></div><div class="field"><label>গ</label><textarea id="qGa"></textarea></div><div class="field"><label>ঘ</label><textarea id="qGha"></textarea></div></div></div><div class="actions"><button class="primary" id="saveQuestion" value="save">সংরক্ষণ করুন</button><button value="cancel">বাতিল</button></div></form></dialog>
+<script>
+const STORAGE_KEY='bd_cq_sq_question_bank_v2';
+const SAMPLE_QUESTIONS=[{"id": "q_101", "class": "নবম-দশম", "subject": "গণিত", "chapter": "৩য় অধ্যায়: বীজগাণিতিক রাশি", "topic": "মান নির্ণয়", "section": "ক-বিভাগ (বীজগণিত)", "type": "CQ", "category": "Easy", "stem": "$x^2 - 3x + 1 = 0$ একটি বীজগাণিতিক সমীকরণ, যেখানে $x > 0$।", "ka": "$x + \\frac{1}{x}$ এর মান নির্ণয় কর।", "kha": "$x^2 + \\frac{1}{x^2}$ এর মান বের কর।", "ga": "$x^3 + \\frac{1}{x^3}$ এর মান নির্ণয় কর।", "gha": "প্রমাণ কর যে, $x^5 + \\frac{1}{x^5} = 123$।"}, {"id": "q_102", "class": "নবম-দশম", "subject": "গণিত", "chapter": "৩য় অধ্যায়: বীজগাণিতিক রাশি", "topic": "উৎপাদকে বিশ্লেষণ", "section": "ক-বিভাগ (বীজগণিত)", "type": "CQ", "category": "Medium Hard", "stem": "$P(x) = x^3 - 6x^2 + 11x - 6$ এবং $Q = a^4 + a^2b^2 + b^4$ দুইটি বীজগাণিতিক রাশি।", "ka": "$4a^2 - 12ab + 9b^2 - 16c^2$ কে উৎপাদকে বিশ্লেষণ কর।", "kha": "$Q$ রাশিটিকে উৎপাদকে বিশ্লেষণ কর।", "ga": "ভাগশেষ উপপাদ্যের সাহায্যে $P(x)$ কে উৎপাদকে বিশ্লেষণ কর।", "gha": "যদি $a^2 + ab + b^2 = 4$ এবং $Q = 8$ হয়, তবে $a^2 + b^2$ এর মান নির্ণয় কর।"}, {"id": "q_103", "class": "নবম-দশম", "subject": "গণিত", "chapter": "৩য় অধ্যায়: বীজগাণিতিক রাশি", "topic": "মান নির্ণয়", "section": "ক-বিভাগ (বীজগণিত)", "type": "CQ", "category": "Hard", "stem": "$y = \\sqrt{5} + \\sqrt{4}$ এবং $p + q + r = m$, $p^2 + q^2 + r^2 = n$, $p^3 + q^3 = s^3$।", "ka": "$\\frac{1}{y}$ এর মান নির্ণয় কর।", "kha": "$y^3 - \\frac{1}{y^3}$ এর মান নির্ণয় কর।", "ga": "দেখাও যে, $y\\sqrt{y} + \\frac{1}{y\\sqrt{y}} = 34\\sqrt{5}$।", "gha": "যদি $r = 0$ হয়, তবে দেখাও যে, $m^3 + 2s^3 = 3mn$।"}, {"id": "q_104", "class": "নবম-দশম", "subject": "গণিত", "chapter": "৩য় অধ্যায়: বীজগাণিতিক রাশি", "topic": "মান নির্ণয়", "section": "ক-বিভাগ (বীজগণিত)", "type": "SQ", "category": "Easy", "question": "$a + b = 7$ এবং $ab = 10$ হলে, $a^2 + b^2$ এর মান কত?", "marks": 2}, {"id": "q_105", "class": "নবম-দশম", "subject": "গণিত", "chapter": "৮ম অধ্যায়: বৃত্ত", "topic": "বৃত্তস্থ ও কেন্দ্রস্থ কোণ", "section": "খ-বিভাগ (জ্যামিতি)", "type": "CQ", "category": "Medium Hard", "stem": "$O$ কেন্দ্রবিশিষ্ট $ABC$ বৃত্তে $AB$ ও $CD$ দুইটি জ্যা বৃত্তের অভ্যন্তরস্থ $E$ বিন্দুতে ছেদ করেছে।", "ka": "বৃত্তের উপচাপের সংজ্ঞা দাও।", "kha": "প্রমাণ কর যে, বৃত্তের কেন্দ্র থেকে ব্যাস ভিন্ন কোনো জ্যা এর ওপর অঙ্কিত লম্ব ঐ জ্যাকে সমদ্বিখণ্ডিত করে।", "ga": "প্রমাণ কর যে, $\\angle AEC = \\frac{1}{2}(\\angle AOC + \\angle BOD)$।", "gha": "যদি $AB$ ও $CD$ পরস্পর লম্ব হয়, তবে প্রমাণ কর যে, $\\angle AOD + \\angle BOC = 180^\\circ$।"}, {"id": "q_106", "class": "নবম-দশম", "subject": "গণিত", "chapter": "৮ম অধ্যায়: বৃত্ত", "topic": "স্পর্শক সংক্রান্ত উপপাদ্য", "section": "খ-বিভাগ (জ্যামিতি)", "type": "CQ", "category": "Hard", "stem": "$O$ কেন্দ্রবিশিষ্ট কোনো বৃত্তের বহিঃস্থ বিন্দু $P$ থেকে বৃত্তে $PA$ ও $PB$ দুইটি স্পর্শক টানা হলো।", "ka": "বৃত্তের ছেদক কাকে বলে?", "kha": "দেখাও যে, বৃত্তের কোনো বিন্দুতে অঙ্কিত স্পর্শক স্পর্শবিন্দুগামী ব্যাসার্ধের ওপর লম্ব।", "ga": "প্রমাণ কর যে, $PA = PB$।", "gha": "প্রমাণ কর যে, $OP$ সরলরেখা স্পর্শ জ্যা $AB$ এর লম্বদ্বিখণ্ডক।"}, {"id": "q_107", "class": "নবম-দশম", "subject": "গণিত", "chapter": "৯ম অধ্যায়: ত্রিকোণমিতিক অনুপাত", "topic": "ত্রিকোণমিতিক অভেদাবলি", "section": "গ-বিভাগ (ত্রিকোণমিতি)", "type": "CQ", "category": "Easy", "stem": "$\\triangle ABC$ সমকোণী ত্রিভুজের $\\angle B = 90^\\circ$ এবং $\\tan A = \\frac{3}{4}$।", "ka": "$AC$ বাহুর দৈর্ঘ্য নির্ণয় কর।", "kha": "$\\sin A + \\cos A$ এর মান নির্ণয় কর।", "ga": "প্রমাণ কর যে, $\\sec^2 A - \\tan^2 A = 1$।", "gha": "যদি $\\angle C = \\theta$ হয়, তবে $\\frac{\\sin\\theta + \\cos\\theta}{\\sin\\theta - \\cos\\theta}$ এর মান নির্ণয় কর।"}, {"id": "q_108", "class": "নবম-দশম", "subject": "গণিত", "chapter": "৯ম অধ্যায়: ত্রিকোণমিতিক অনুপাত", "topic": "ত্রিকোণমিতিক সমীকরণ", "section": "গ-বিভাগ (ত্রিকোণমিতি)", "type": "SQ", "category": "Medium Hard", "question": "$2\\cos^2\\theta + 3\\sin\\theta - 3 = 0$ হলে, $\\theta$ এর সূক্ষ্মকোণের মান নির্ণয় কর।", "marks": 2}, {"id": "q_201", "class": "Class 9-10", "subject": "English 1st Paper", "chapter": "Unit 3: Events and Festivals", "topic": "International Mother Language Day", "section": "Section A (Reading)", "type": "CQ", "category": "Easy", "stem": "21 February is a memorable day in our national history. We observe the day every year as International Mother Language Day. The day is a national holiday. On this day, we pay tribute to the martyrs who laid down their lives to establish Bangla as a state language in undivided Pakistan in 1952.", "ka": "Why is 21 February a memorable day in our national history?", "kha": "Explain why the martyrs laid down their lives in 1952.", "ga": "How do people across the country observe 21 February every year?", "gha": "Evaluate the significance of UNESCO declaring 21 February as International Mother Language Day."}, {"id": "q_202", "class": "Class 9-10", "subject": "English 1st Paper", "chapter": "Unit 3: Events and Festivals", "topic": "Pahela Boishakh", "section": "Section B (Literature)", "type": "SQ", "category": "Medium Hard", "question": "What does Pahela Boishakh signify for the people of Bangladesh regardless of caste and creed?", "marks": 2}, {"id": "q_301", "class": "الصف التاسع", "subject": "اللغة العربية", "chapter": "الوحدة الأولى: الأخلاق الحميدة", "topic": "الصدق والأمانة", "section": "القسم الأول (النصوص)", "type": "CQ", "category": "Easy", "stem": "الصدق من أعظم الأخلاق الإسلامية التي دعا إليها القرآن الكريم والسنة النبوية، وهو طريق النجاة في الدنيا والآخرة، بينما الكذب يهدي إلى الفجور.", "ka": "ما هو أعظم الأخلاق الإسلامية حسب النص؟", "kha": "لماذا يعتبر الصدق طريق النجاة للإنسان في المجتمع؟", "ga": "اذكر ثلاثة آثار إيجابية للصدق في حياة الطالب.", "gha": "قارن بين عاقبة الصادقين وعاقبة الكاذبين في ضوء ما درست."}, {"id": "q_302", "class": "الصف التاسع", "subject": "اللغة العربية", "chapter": "الوحدة الثانية: القواعد", "topic": "المبتدأ والخبر", "section": "القسم الثاني (القواعد)", "type": "SQ", "category": "Medium Hard", "question": "عرّف المبتدأ والخبر مع ذكر مثالين مفيدين من إنشائك.", "marks": 2}];
+let bank=loadBank(), paper=[], language='bn', paperMarks={sq:2,cq:[1,2,3,4]};
+function loadBank(){try{let x=JSON.parse(localStorage.getItem(STORAGE_KEY));return Array.isArray(x)&&x.length?x:structuredClone(SAMPLE_QUESTIONS)}catch{return structuredClone(SAMPLE_QUESTIONS)}}
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(bank));document.getElementById('saveStatus').textContent='Saved locally';count();saveCQCloudBank()}\n
+// Firebase: একই project, কিন্তু CQ/SQ ডেটার জন্য সম্পূর্ণ আলাদা collection।
+const CQ_FIREBASE_CONFIG = {
+  apiKey: "PASTE_YOUR_FIREBASE_WEB_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_FIREBASE_APP_ID"
+};
+const CQ_ADMIN_EMAIL = "YOUR_ADMIN_EMAIL@example.com";
+const CQ_COLLECTION = "cq_sq_question_banks";
+const CQ_DOC_ID = "main";
+let cqDb = null, cqAuth = null, cqCloudReady = false, cqCloudBusy = false;
+
+function initCQFirebase() {
+  if (cqDb) return true;
+  if (!window.firebase || CQ_FIREBASE_CONFIG.apiKey.startsWith("PASTE_") ||
+      CQ_FIREBASE_CONFIG.projectId === "YOUR_PROJECT_ID") {
+    const st = document.getElementById("firebaseStatus");
+    if (st) st.textContent = "প্রথমে CQ_FIREBASE_CONFIG-এ নিজের Firebase Web App config বসাও।";
+    return false;
+  }
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(CQ_FIREBASE_CONFIG);
+    cqAuth = firebase.auth();
+    cqDb = firebase.firestore();
+    return true;
+  } catch (e) {
+    console.error("CQ Firebase init error:", e);
+    const st = document.getElementById("firebaseStatus");
+    if (st) st.textContent = "Firebase initialize হয়নি: " + e.message;
+    return false;
+  }
+}
+async function connectCQFirebase() {
+  if (!initCQFirebase()) return;
+  try {
+    let user = cqAuth.currentUser;
+    if (!user) {
+      const email = prompt("Firebase Admin Email দিন:");
+      if (!email) return;
+      const password = prompt("Firebase Admin Password দিন:");
+      if (!password) return;
+      const cred = await cqAuth.signInWithEmailAndPassword(email.trim(), password);
+      user = cred.user;
+    }
+    if (CQ_ADMIN_EMAIL !== "YOUR_ADMIN_EMAIL@example.com" &&
+        (user.email || "").toLowerCase() !== CQ_ADMIN_EMAIL.toLowerCase()) {
+      await cqAuth.signOut();
+      throw new Error("এই Email-টি অনুমোদিত Admin Email নয়।");
+    }
+    cqCloudReady = true;
+    await loadCQCloudBank();
+    const st = document.getElementById("firebaseStatus");
+    if (st) st.textContent = "Firebase সংযুক্ত: " + (user.email || "authenticated user");
+    toast("CQ/SQ প্রশ্নব্যাংক Firebase থেকে লোড হয়েছে।");
+  } catch (e) {
+    cqCloudReady = false;
+    console.error(e);
+    const st = document.getElementById("firebaseStatus");
+    if (st) st.textContent = "সংযোগ ব্যর্থ: " + e.message;
+    toast("Firebase সংযোগ ব্যর্থ। Console ও Rules পরীক্ষা করুন।");
+  }
+}
+async function loadCQCloudBank() {
+  if (!cqDb || !cqCloudReady) return;
+  const snap = await cqDb.collection(CQ_COLLECTION).doc(CQ_DOC_ID).get();
+  if (snap.exists && Array.isArray(snap.data().questions)) {
+    bank = snap.data().questions;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(bank));
+    refreshFilters(); renderBank(); renderSelected(); renderPaper();
+    count();
+  }
+}
+async function saveCQCloudBank() {
+  if (!cqDb || !cqCloudReady || cqCloudBusy) return;
+  cqCloudBusy = true;
+  try {
+    await cqDb.collection(CQ_COLLECTION).doc(CQ_DOC_ID).set({
+      questions: bank,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+    const st = document.getElementById("firebaseStatus");
+    if (st) st.textContent = "Firebase-এ সর্বশেষ সংরক্ষণ হয়েছে।";
+  } catch (e) {
+    console.error("CQ cloud save failed:", e);
+    const st = document.getElementById("firebaseStatus");
+    if (st) st.textContent = "Cloud save ব্যর্থ: " + e.message;
+    toast("Cloud save হয়নি; Local backup রাখা হয়েছে।");
+  } finally { cqCloudBusy = false; }
+}
+
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(s){let t=document.getElementById('toast');t.textContent=s;t.style.display='block';setTimeout(()=>t.style.display='none',2400)}
+function count(){document.getElementById('bankCount').textContent='('+bank.length+')'}
+function unique(key){return [...new Set(bank.map(q=>q[key]).filter(Boolean))].sort()}
+function options(id,vals,all='সব',includeAll=true){let e=document.getElementById(id),old=e.multiple?[...e.selectedOptions].map(o=>o.value):e.value;if(e.multiple){e.innerHTML=`<option value="__ALL__">${all}</option>`+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');[...e.options].forEach(o=>o.selected=old.includes(o.value));if(!old.length)e.options[0].selected=true;}else{e.innerHTML=(includeAll?`<option value="ALL">${all}</option>`:'')+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');if(vals.includes(old))e.value=old;else if(vals.length)e.value=vals[0];}}
+function selectedValues(id){let vals=[...document.getElementById(id).selectedOptions].map(o=>o.value);return vals.includes('__ALL__')?[]:vals}
+function normalizeMulti(id){let e=document.getElementById(id),all=e.querySelector('option[value="__ALL__"]');if(!all)return;if(all.selected){[...e.options].forEach(o=>o.selected=o===all)}else if([...e.selectedOptions].some(o=>o.value!=='__ALL__'))all.selected=false;}
+function refreshFilters(){options('fClass',unique('class'),'শ্রেণি নির্বাচন করুন',false);options('fSubject',unique('subject'),'বিষয় নির্বাচন করুন',false);refreshChapterTopic();options('bankSubject',unique('subject'),'সব বিষয়',false)}
+function refreshChapterTopic(){let cls=document.getElementById('fClass').value,sub=document.getElementById('fSubject').value;let relevant=bank.filter(q=>(!cls||q.class===cls)&&(!sub||q.subject===sub));options('fChapter',[...new Set(relevant.map(q=>q.chapter).filter(Boolean))].sort(),'সব অধ্যায়');let chs=selectedValues('fChapter');let topicRows=relevant.filter(q=>!chs.length||chs.includes(q.chapter));options('fTopic',[...new Set(topicRows.map(q=>q.topic).filter(Boolean))].sort(),'সব টপিক');}
+function renderBank(){let term=document.getElementById('search').value.toLowerCase(),type=document.getElementById('bankType').value,sub=document.getElementById('bankSubject').value;let rows=bank.filter(q=>(type==='ALL'||q.type===type)&&(sub==='ALL'||q.subject===sub)&&JSON.stringify(q).toLowerCase().includes(term));document.getElementById('filteredCount').textContent=`${rows.length} / ${bank.length} টি প্রশ্ন`;document.getElementById('bankList').innerHTML=rows.map(q=>`<article class="qcard"><div class="qtop"><div><span class="tag">${esc(q.type)}</span><span class="tag">${esc(q.category)}</span><b>${esc(q.subject||'')}</b><div class="muted">${esc(q.class||'')} · ${esc(q.chapter||'')} · ${esc(q.section||'')}</div></div><div><button class="small" onclick="editQuestion('${q.id}')">Edit</button> <button class="small danger" onclick="deleteQuestion('${q.id}')">Delete</button></div></div><div class="qtext">${esc(q.type==='SQ'?q.question:q.stem)}</div></article>`).join('')||'<p class="muted">কোনো প্রশ্ন পাওয়া যায়নি।</p>';count()}
+function editQuestion(id){let q=bank.find(x=>x.id===id);if(!q)return;document.getElementById('editorTitle').textContent='প্রশ্ন সম্পাদনা';document.getElementById('editId').value=id;for(let [id,v] of Object.entries({qClass:q.class,qSubject:q.subject,qChapter:q.chapter,qTopic:q.topic,qSection:q.section,qType:q.type,qCategory:q.category,qQuestion:q.question,qMarks:q.marks||2,qStem:q.stem,qKa:q.ka,qKha:q.kha,qGa:q.ga,qGha:q.gha}))document.getElementById(id).value=v??'';toggleFields();document.getElementById('editor').showModal()}
+function deleteQuestion(id){if(confirm('এই প্রশ্নটি মুছে ফেলবেন?')){bank=bank.filter(q=>q.id!==id);save();renderBank();refreshFilters()}}
+function toggleFields(){let sq=document.getElementById('qType').value==='SQ';document.getElementById('sqFields').classList.toggle('hidden',!sq);document.getElementById('cqFields').classList.toggle('hidden',sq)}
+function makePaper(){let f=id=>document.getElementById(id).value;let cls=f('fClass'),sub=f('fSubject');if(!cls||!sub){toast('প্রথমে শ্রেণি ও বিষয় নির্বাচন করুন।');return;}let chapters=selectedValues('fChapter'),topics=selectedValues('fTopic');paperMarks={sq:Math.max(1,Number(f('sqPaperMarks'))||2),cq:[['cqKaMarks'],['cqKhaMarks'],['cqGaMarks'],['cqGhaMarks']].map(a=>Math.max(0,Number(f(a[0]))||0))};let pool=bank.filter(q=>q.class===cls&&q.subject===sub&&(!chapters.length||chapters.includes(q.chapter))&&(!topics.length||topics.includes(q.topic))&&(f('fCategory')==='ALL'||q.category===f('fCategory'))&&(f('fType')==='ALL'||q.type===f('fType')));let cq=pool.filter(q=>q.type==='CQ'),sq=pool.filter(q=>q.type==='SQ');let nc=Math.max(0,Number(f('cqCount'))||0),ns=Math.max(0,Number(f('sqCount'))||0);if(f('fType')==='CQ')ns=0;if(f('fType')==='SQ')nc=0;if(nc+ns===0){toast('CQ অথবা SQ-এর সংখ্যা অন্তত ১ দিন।');return;}if(pool.length===0){document.getElementById('poolInfo').textContent='ফিল্টার অনুযায়ী কোনো প্রশ্ন পাওয়া যায়নি।';toast('নির্বাচিত শ্রেণি, বিষয়, অধ্যায় ও টপিকে প্রশ্ন নেই। প্রশ্নব্যাংকে প্রশ্ন যোগ করুন বা ফিল্টার পরিবর্তন করুন।');return;}let pick=(a,n)=>a.sort(()=>Math.random()-.5).slice(0,n);paper=[...pick([...cq],nc),...pick([...sq],ns)];document.getElementById('poolInfo').textContent=`ফিল্টারকৃত প্রশ্ন: ${pool.length} | CQ: ${cq.length} | SQ: ${sq.length} | নির্বাচিত: ${paper.length}`;if(paper.length<nc+ns)toast(`চাহিদা অনুযায়ী প্রশ্ন নেই। ${paper.length}টি প্রশ্ন পাওয়া গেছে।`);renderSelected();renderPaper();showTab('paper')}
+function renderSelected(){document.getElementById('selectedList').innerHTML=paper.map((q,i)=>`<div class="qcard"><b>${i+1}. ${esc(q.type)} — ${esc(q.subject)}</b><div class="qtext">${esc(q.type==='SQ'?q.question:q.stem)}</div><button class="small" onclick="removePaper(${i})">বাদ দিন</button></div>`).join('')||'<p class="muted">এখনো প্রশ্ন নির্বাচন করা হয়নি।</p>'}
+function removePaper(i){paper.splice(i,1);renderSelected();renderPaper()}
+function showTab(id){document.querySelectorAll('.tab[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));document.querySelectorAll('main .panel').forEach(p=>p.classList.toggle('active',p.id===id));if(id==='paper')renderPaper()}
+function renderPaper(){let en=language==='en',ar=language==='ar',cfg={school:document.getElementById('school').value,exam:document.getElementById('exam').value,cls:document.getElementById('className').value,sub:document.getElementById('subjectName').value,time:document.getElementById('examTime').value,marks:document.getElementById('fullMarks').value,inst:document.getElementById('instruction').value};let labels=en?['a.','b.','c.','d.']:ar?['أ.','ب.','ج.','د.']:['ক.','খ.','গ.','ঘ.'];let title=en?'Short Questions':'সংক্ষিপ্ত প্রশ্ন';let cqtitle=en?'Creative Questions':ar?'الأسئلة الإبداعية':'সৃজনশীল প্রশ্ন';let sqItems=paper.filter(q=>q.type==='SQ'),cqItems=paper.filter(q=>q.type==='CQ');let sqBody=sqItems.map((q,i)=>`<div class="paper-q">${i+1}. ${esc(q.question)} <span style="float:right">[${paperMarks.sq}]</span></div>`).join('');let cqTotal=paperMarks.cq.reduce((a,b)=>a+b,0);let cqBody=cqItems.map((q,i)=>`<div class="paper-q"><b>${i+1}. ${esc(q.stem||'')} <span style="float:right">[${cqTotal}]</span></b><div class="parts">${[q.ka,q.kha,q.ga,q.gha].map((v,j)=>`<div>${labels[j]} ${esc(v||'')} <span style="float:right">[${paperMarks.cq[j]}]</span></div>`).join('')}</div></div>`).join('');let cqs=cqItems.length,sqs=sqItems.length;document.getElementById('paperView').className='paper'+(ar?' rtl':'');document.getElementById('paperView').innerHTML=`<div class="paperhead"><h2>${esc(cfg.school)}</h2><b>${esc(cfg.exam)}</b></div><div class="paper-meta"><span>${en?'Class':ar?'الصف':'শ্রেণি'}: ${esc(cfg.cls)}</span><span>${en?'Subject':ar?'المادة':'বিষয়'}: ${esc(cfg.sub)}</span></div><div class="paper-meta"><span>${en?'Time':ar?'الوقت':'সময়'}: ${esc(cfg.time)}</span><span>${en?'Full Marks':ar?'الدرجة الكاملة':'পূর্ণমান'}: ${esc(cfg.marks)}</span></div><p>${esc(cfg.inst)}</p>${sqs?`<h3>${title}</h3>${sqBody}`:''}${cqs?`<h3>${cqtitle}</h3>${cqBody}`:''}`}
+function download(name,content,type){let a=document.createElement('a'),u=URL.createObjectURL(new Blob([content],{type}));a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
+
+document.querySelectorAll('.tab[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+function updatePoolInfo(){let f=id=>document.getElementById(id).value,chs=selectedValues('fChapter'),tops=selectedValues('fTopic');let pool=bank.filter(q=>(f('fClass')==='ALL'||q.class===f('fClass'))&&(f('fSubject')==='ALL'||q.subject===f('fSubject'))&&(!chs.length||chs.includes(q.chapter))&&(!tops.length||tops.includes(q.topic))&&(f('fCategory')==='ALL'||q.category===f('fCategory'))&&(f('fType')==='ALL'||q.type===f('fType')));document.getElementById('poolInfo').textContent=`ফিল্টারকৃত প্রশ্ন: ${pool.length}`;}
+['fClass','fSubject'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{refreshChapterTopic();updatePoolInfo()}));['fChapter'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{normalizeMulti(id);let chs=selectedValues('fChapter'),cls=document.getElementById('fClass').value,sub=document.getElementById('fSubject').value;let rows=bank.filter(q=>(!cls||q.class===cls)&&(!sub||q.subject===sub)&&(!chs.length||chs.includes(q.chapter)));options('fTopic',[...new Set(rows.map(q=>q.topic).filter(Boolean))].sort(),'সব টপিক');updatePoolInfo()}));document.getElementById('fTopic').addEventListener('change',()=>{normalizeMulti('fTopic');updatePoolInfo()});['fCategory','fType','cqCount','sqCount','sqPaperMarks','cqKaMarks','cqKhaMarks','cqGaMarks','cqGhaMarks'].forEach(id=>document.getElementById(id).addEventListener('change',updatePoolInfo));
+document.getElementById('generate').onclick=makePaper;document.getElementById('clearPaper').onclick=()=>{paper=[];renderSelected();renderPaper()};
+document.getElementById('addQuestion').onclick=()=>{document.getElementById('questionForm').reset();document.getElementById('editId').value='';document.getElementById('qClass').value='নবম-দশম';document.getElementById('editorTitle').textContent='নতুন প্রশ্ন যোগ করুন';toggleFields();document.getElementById('editor').showModal()};document.getElementById('qType').onchange=toggleFields;
+document.getElementById('saveQuestion').onclick=e=>{e.preventDefault();let id=document.getElementById('editId').value||'q_'+Date.now(),type=document.getElementById('qType').value,q={id,class:document.getElementById('qClass').value,subject:document.getElementById('qSubject').value.trim(),chapter:document.getElementById('qChapter').value.trim(),topic:document.getElementById('qTopic').value.trim(),section:document.getElementById('qSection').value.trim(),type,category:document.getElementById('qCategory').value};if(type==='SQ'){q.question=document.getElementById('qQuestion').value.trim();q.marks=+document.getElementById('qMarks').value||2;if(!q.question)return toast('প্রশ্ন লিখুন।')}else{Object.assign(q,{stem:document.getElementById('qStem').value.trim(),ka:document.getElementById('qKa').value.trim(),kha:document.getElementById('qKha').value.trim(),ga:document.getElementById('qGa').value.trim(),gha:document.getElementById('qGha').value.trim()});if(!q.stem&&!q.ka&&!q.kha&&!q.ga&&!q.gha)return toast('প্রশ্নের তথ্য লিখুন।')}if(!q.subject)return toast('বিষয় লিখুন।');let i=bank.findIndex(x=>x.id===id);if(i>=0)bank[i]=q;else bank.unshift(q);save();refreshFilters();renderBank();document.getElementById('editor').close();toast('প্রশ্ন সংরক্ষিত হয়েছে।')};
+['search','bankType','bankSubject'].forEach(id=>document.getElementById(id).addEventListener('input',renderBank));
+document.getElementById('exportJson').onclick=()=>download('question-bank-backup.json',JSON.stringify(bank,null,2),'application/json');document.getElementById('importJson').onchange=async e=>{let file=e.target.files[0];if(!file)return;try{let data=JSON.parse(await file.text());if(!Array.isArray(data))throw Error();bank=data;save();refreshFilters();renderBank();toast('ব্যাকআপ ইমপোর্ট হয়েছে।')}catch{toast('সঠিক JSON ফাইল নির্বাচন করুন।')}e.target.value=''};
+document.getElementById('language').onchange=e=>{language=e.target.value;renderPaper()};document.getElementById('print').onclick=()=>window.print();document.getElementById('word').onclick=()=>{let content='<!doctype html><html><head><meta charset="utf-8"><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head><body>'+document.getElementById('paperView').innerHTML+'
+<!-- Firebase setup notes:
+1) Firebase Console > Project settings > Your apps > Web app: copy the Web config into CQ_FIREBASE_CONFIG.
+2) Authentication > Sign-in method: enable Email/Password and create your own admin user.
+3) Replace CQ_ADMIN_EMAIL with that admin email.
+4) Firestore Rules (replace YOUR_ADMIN_EMAIL@example.com):
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null &&
+             request.auth.token.email == "YOUR_ADMIN_EMAIL@example.com";
+    }
+    match /cq_sq_question_banks/{docId} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
+This rule grants this CQ collection only to the specified signed-in email.
+The existing MCQ app has its own collection/documents and its own existing rules;
+do not replace those rules blindly. Merge rules carefully so existing MCQ functionality
+continues to work. The MCQ HTML currently has placeholder Firebase config values,
+so its real project connection cannot be verified from this copy.
+-->
+\n</body></html>';download('question-paper.doc',content,'application/msword')};
+['school','exam','className','subjectName','examTime','fullMarks','instruction','sqPaperMarks','cqKaMarks','cqKhaMarks','cqGaMarks','cqGhaMarks'].forEach(id=>document.getElementById(id).addEventListener('input',renderPaper));
+document.getElementById('firebaseConnectBtn')?.addEventListener('click', connectCQFirebase);\nrefreshFilters();renderBank();renderSelected();renderPaper();save();
+</script>
+<!-- Firebase setup notes:
+1) Firebase Console > Project settings > Your apps > Web app: copy the Web config into CQ_FIREBASE_CONFIG.
+2) Authentication > Sign-in method: enable Email/Password and create your own admin user.
+3) Replace CQ_ADMIN_EMAIL with that admin email.
+4) Firestore Rules (replace YOUR_ADMIN_EMAIL@example.com):
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null &&
+             request.auth.token.email == "YOUR_ADMIN_EMAIL@example.com";
+    }
+    match /cq_sq_question_banks/{docId} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
+This rule grants this CQ collection only to the specified signed-in email.
+The existing MCQ app has its own collection/documents and its own existing rules;
+do not replace those rules blindly. Merge rules carefully so existing MCQ functionality
+continues to work. The MCQ HTML currently has placeholder Firebase config values,
+so its real project connection cannot be verified from this copy.
+-->
+\n</body></html>
