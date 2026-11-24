@@ -57,7 +57,6 @@
         <button type="button" onclick="promptTeacherLogin()" class="text-xs bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-3 py-1.5 rounded-lg transition">
           Teacher Admin
         </button>
-        <a href="CQ-Generator-Firebase-ready.html" style="top:12px;right:14px;z-index:80;background:#059669;color:white;padding:7px 10px;border-radius:5px;text-decoration:none;font:600 13px system-ui;box-shadow:0 4px 12px #0002">CQ Generator ↗</a>
       </div>
     </div>
   </header>
@@ -68,6 +67,7 @@
     <section id="teacher-view" class="hidden space-y-6">
       <div class="flex justify-between items-center bg-indigo-50 p-4 rounded-xl border border-indigo-100">
         <div class="flex items-center gap-3">
+          <a id="cq-generator-link" href="CQ-Generator-Firebase-ready.html" class="hidden" style="background:#059669;color:white;padding:7px 10px;border-radius:5px;text-decoration:none;font:600 13px system-ui;box-shadow:0 4px 12px #0002">CQ Generator ↗</a>
           <span class="text-sm font-bold text-indigo-900">🔒 Teacher Admin Panel</span>
           <button type="button" onclick="manualRefreshAdmin()" class="text-xs bg-indigo-600 text-white font-semibold px-3 py-1.5 rounded hover:bg-indigo-700 transition">
             ↻ Refresh Panel Data
