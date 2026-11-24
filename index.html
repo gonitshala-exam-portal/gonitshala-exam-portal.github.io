@@ -844,32 +844,40 @@
       }
     }
 
-    async function promptTeacherLogin() {
-      if (isExamInProgress) {
-        showBanglaWarning('পরীক্ষা চলাকালীন অ্যাডমিন প্যানেলে যাওয়া যাবে না!');
-        return;
-      }
-      const activeAdminPassword = await loadDynamicAdminPassword();
-      const pwd = prompt("Enter Teacher Password:");
-      if (pwd === activeAdminPassword) {
-        isAdminLoggedIn = true;
-        hideBanglaWarning();
-        document.getElementById('teacher-view').classList.remove('hidden');
-        document.getElementById('student-view').classList.add('hidden');
-        syncResultsFromCloud();
-      } else {
-        alert("Incorrect password!");
-        window.location.hash = '';
-      }
+    function setCqGeneratorLinkVisible(visible) {
+      const cqLink = document.getElementById('cq-generator-link');
+      if (!cqLink) return;
+      cqLink.classList.toggle('hidden', !visible);
     }
+    
+async function promptTeacherLogin() {
+  if (isExamInProgress) {
+    showBanglaWarning('পরীক্ষা চলাকালীন অ্যাডমিন প্যানেলে যাওয়া যাবে না!');
+    return;
+  }
+  const activeAdminPassword = await loadDynamicAdminPassword();
+  const pwd = prompt("Enter Teacher Password:");
+  if (pwd === activeAdminPassword) {
+    isAdminLoggedIn = true;
+    hideBanglaWarning();
+    document.getElementById('teacher-view').classList.remove('hidden');
+    document.getElementById('student-view').classList.add('hidden');
+    setCqGeneratorLinkVisible(true);
+    syncResultsFromCloud();
+  } else {
+    alert("Incorrect password!");
+    window.location.hash = '';
+    setCqGeneratorLinkVisible(false);
+  }
+}
 
-    function logoutTeacher() {
-      isAdminLoggedIn = false;
-      window.location.hash = '';
-      document.getElementById('teacher-view').classList.add('hidden');
-      document.getElementById('student-view').classList.remove('hidden');
-    }
-
+function logoutTeacher() {
+  isAdminLoggedIn = false;
+  window.location.hash = '';
+  setCqGeneratorLinkVisible(false);
+  document.getElementById('teacher-view').classList.add('hidden');
+  document.getElementById('student-view').classList.remove('hidden');
+}
     function renderTeacherQuestions() {
       const container = document.getElementById('question-list');
       container.innerHTML = '';
