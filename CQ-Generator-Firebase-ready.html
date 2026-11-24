@@ -153,14 +153,22 @@ document.getElementById('saveQuestion').onclick=e=>{e.preventDefault();let id=do
 document.getElementById('exportJson').onclick=()=>download('question-bank-backup.json',JSON.stringify(bank,null,2),'application/json');document.getElementById('importJson').onchange=async e=>{let file=e.target.files[0];if(!file)return;try{let data=JSON.parse(await file.text());if(!Array.isArray(data))throw Error();bank=data;save();refreshFilters();renderBank();toast('ব্যাকআপ ইমপোর্ট হয়েছে।')}catch{toast('সঠিক JSON ফাইল নির্বাচন করুন।')}e.target.value=''};
 document.getElementById('language').onchange=e=>{language=e.target.value;renderPaper()};document.getElementById('print').onclick=()=>window.print();
 
+
 document.getElementById('word').onclick = () => {
-    let content =
-        '<!doctype html>' +
-        '<html>' +
-        '<head><meta charset="utf-8"></head>' +
-        '<body>' +
-        document.getElementById('paperView').innerHTML +
-        '</body></html>';
+    const paperContent = document.getElementById('paperView').innerHTML;
+
+    const content = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Question Paper</title>
+        </head>
+        <body>
+            ${paperContent}
+        </body>
+        </html>
+    `;
 
     download(
         'question-paper.doc',
@@ -168,34 +176,8 @@ document.getElementById('word').onclick = () => {
         'application/msword'
     );
 };
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-</head><body>'+document.getElementById('paperView').innerHTML+'
-<!-- Firebase setup notes:
-1) Firebase Console > Project settings > Your apps > Web app: copy the Web config into CQ_FIREBASE_CONFIG.
-2) Authentication > Sign-in method: enable Email/Password and create your own admin user.
-3) Replace CQ_ADMIN_EMAIL with that admin email.
-4) Firestore Rules (replace YOUR_ADMIN_EMAIL@example.com):
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    function isAdmin() {
-      return request.auth != null &&
-             request.auth.token.email == "YOUR_ADMIN_EMAIL@example.com";
-    }
-    match /cq_sq_question_banks/{docId} {
-      allow read, write: if isAdmin();
-    }
-  }
-}
-This rule grants this CQ collection only to the specified signed-in email.
-The existing MCQ app has its own collection/documents and its own existing rules;
-do not replace those rules blindly. Merge rules carefully so existing MCQ functionality
-continues to work. The MCQ HTML currently has placeholder Firebase config values,
-so its real project connection cannot be verified from this copy.
--->
-\n</body></html>';download('question-paper.doc',content,'application/msword')};
-['school','exam','className','subjectName','examTime','fullMarks','instruction','sqPaperMarks','cqKaMarks','cqKhaMarks','cqGaMarks','cqGhaMarks'].forEach(id=>document.getElementById(id).addEventListener('input',renderPaper));
+
+
 document.getElementById('firebaseConnectBtn')
     ?.addEventListener('click', connectCQFirebase);
 
